@@ -1,0 +1,3 @@
+Развернул mongo в докере под Linux
+
+sudo docker run --name mongo_home -p 27017:27017 -d mongo
