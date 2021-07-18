@@ -4,7 +4,7 @@ import pandas as pd
 from fake_headers import Headers
 from bs4 import BeautifulSoup as bs
 from pymongo import MongoClient
-
+from hw_3.hw3_task_3 import insert_if_not_exists
 
 URL_HH = 'https://hh.ru/search/vacancy'
 URL_SJ = 'https://www.superjob.ru/vacancy/search/'
@@ -113,4 +113,5 @@ if __name__ == '__main__':
               'link': df['Link'][i],
               'source': df['Source'][i]} for i in df.index]
 
-    db_collection.insert_many(query)
+    insert_if_not_exists(query, host=MONGO_HOST, database=DB_NAME, collection=COLLECTION_NAME)
+    # db_collection.insert_many(query)
