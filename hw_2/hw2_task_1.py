@@ -3,6 +3,7 @@ import re
 import pandas as pd
 from fake_headers import Headers
 from bs4 import BeautifulSoup as bs
+from pymongo import MongoClient
 
 
 URL_HH = 'https://hh.ru/search/vacancy'
@@ -10,6 +11,10 @@ URL_SJ = 'https://www.superjob.ru/vacancy/search/'
 df_cols = ['Title', 'Salary (min)', 'Salary (max)', 'Currency', 'Link', 'Source']
 vacancy = 'Data scientist'      # job title
 pages = 3                       # amount of pages to parse on each site
+
+MONGO_HOST = 'mongodb://localhost:27017/'
+DB_NAME = 'gb_homework'
+COLLECTION_NAME = 'vacancies'
 
 
 def parse_salary(salaries):
@@ -94,3 +99,18 @@ if __name__ == '__main__':
     df.drop_duplicates(inplace=True, ignore_index=True)
     df.index = df.index + 1
     df.to_csv('vacancies.csv')
+
+    # Save to local MongoDG
+    client = MongoClient('mongodb://localhost:27017/')
+    # get database and collection
+    db = client[DB_NAME]
+    db_collection = db[COLLECTION_NAME]
+
+    query = [{'title': df['Title'][i],
+              'min_salary': df['Salary (min)'][i],
+              'max_salary': df['Salary (max)'][i],
+              'currency': df['Currency'][i],
+              'link': df['Link'][i],
+              'source': df['Source'][i]} for i in df.index]
+
+    db_collection.insert_many(query)
