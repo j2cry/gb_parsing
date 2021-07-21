@@ -79,12 +79,12 @@ def get_yandex_news():
         response = requests.get(link, headers=header)
         root = html.fromstring(response.text)
         link = root.xpath('//a[@class="news-story__title-link"]/@href')[0]
-        # link = root.xpath('//div[@class="news-story__head"]/a/@href')[0]       # почему блять ты не работаешь
+        # link = root.xpath('//div[@class="news-story__head"]/a/@href')[0]
         print(link)
         # get datetime
         # response = requests.get(link, headers=header)
         # root = html.fromstring(response.text)
-        # published_at = root.xpath('time/@datetime')
+        # published_at = root.xpath('//time/@datetime')
         # print(published_at)
         sleep(2)
 
@@ -94,7 +94,8 @@ def test():
     url = 'https://yandex.ru/news/story/Zamnachalnika_Stavropolskogo_UGIBDD_Tkachenko_zaderzhan_vMoskve--f7ab8a8885e5dc387a4f577a40136fab?lang=ru&from=main_portal&fan=1&stid=-GrYgyJ3fWt69TF8gpja&t=1626867004&persistent_id=153721618&lr=213&msid=1626867380.30222.85684.195720&mlid=1626867004.glob_225.f7ab8a88&utm_source=morda_desktop&utm_medium=topnews_news'
     response = requests.get(url)
     root = html.fromstring(response.text)
-    link = root.xpath('//a[@class="news-story__title-link"]/@href')
+    link = root.xpath('//a[@class="news-story__subtitle"]/@href')
+    # link = root.xpath('//a[@class="news-story__title-link"]/@href')
     print(link)
 
 
