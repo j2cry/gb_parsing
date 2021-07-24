@@ -1,7 +1,8 @@
 import scrapy
 from scrapy.http import HtmlResponse
 from hw_5.leroy_scraper.items import LeroyScraperItem
-from scrapy.loader import ItemLoader
+from itemloaders import ItemLoader, processors
+# from scrapy.loader import ItemLoader
 
 
 class LeroyScraperSpider(scrapy.Spider):
@@ -23,19 +24,22 @@ class LeroyScraperSpider(scrapy.Spider):
         for link in links:
             yield response.follow(link, callback=self.product_parse)
 
-    def product_parse(self, response: HtmlResponse):
-        # get product characteristics
-        _id = response.xpath('//span[@slot="article"]/@content').get('')
-        title = response.xpath('//h1[@slot="title"]/text()').get('')
-        link = response.url
-        images = response.xpath('//picture[@slot="pictures"]/source[1]/@srcset').extract()
-        yield LeroyScraperItem(_id=_id,
-                               title=title,
-                               link=link,
-                               images=images)
+    @staticmethod
+    def product_parse(response: HtmlResponse):
+        product = ItemLoader(item=LeroyScraperItem(), selector=response)
+        product.default_output_processor = processors.Join(' ')
 
-    def features_parse(self, response: HtmlResponse):
-        features = ItemLoader(item=LeroyScraperItem(), response=response)
-        features.add_xpath('price', '')
+        product.add_xpath('_id', '//span[@slot="article"]/@content')
+        product.add_value('link', response.url)
+        product.add_xpath('images', '//picture[@slot="pictures"]/source[1]/@srcset')
+        product.add_xpath('title', '//h1[@slot="title"]/text()')
+        product.add_xpath('price', '//span[@slot="price"]/text()')
 
-        return features.load_item()
+        feature_keys = response.xpath('//dt[@class="def-list__term"]/text()').extract()
+        feature_values = response.xpath('//dd[@class="def-list__definition"]/text()').extract()
+        feature_values = [value.strip() for value in feature_values]
+        features = list(zip(feature_keys, feature_values))
+        product.add_value('features', features)
+
+        # test = product.load_item()
+        return product.load_item()

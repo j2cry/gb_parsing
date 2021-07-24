@@ -6,9 +6,8 @@
 
 # useful for handling different item types with a single interface
 import pathlib
-
 import scrapy
-from itemadapter import ItemAdapter
+from collections import defaultdict
 from pymongo import MongoClient
 from scrapy.pipelines.images import ImagesPipeline
 from settings import IMAGES_STORE
@@ -21,12 +20,27 @@ class LeroyDataScraperPipeline:
     def __init__(self):
         client = MongoClient(MONGO_HOST)
         self.db = client[DB_NAME]
-        self.base_path = pathlib.Path(IMAGES_STORE)
+        self.base_path = pathlib.Path(IMAGES_STORE).absolute()
 
-    def process_item(self, item, spider):
+    def parse_item(self, product_item) -> dict:
+        """ Prepare item for adding to database """
+        item = defaultdict(object)
+
+        for key, value in product_item.items():
+            if key == 'images':
+                item[key] = self.base_path.joinpath(product_item['_id']).as_posix()
+            elif key == 'features':
+                for feat_key, feat_value in product_item[key]:
+                    item[feat_key] = feat_value
+            else:
+                item[key] = value
+        return item
+
+    def process_item(self, product_item, spider):
+        """ Add item to database """
+        item = self.parse_item(product_item)
         collection = self.db[spider.name]
         if collection.count_documents(item) == 0:
-            item['images'] = self.base_path.joinpath(item['_id'])
             collection.insert_one(item)
         return item
 
@@ -47,7 +61,7 @@ class LeroyImagesScraperPipeline(ImagesPipeline):
         return item
 
     def file_path(self, request, response=None, info=None, *, item=None):
-        base_path = pathlib.Path.home().joinpath('data', 'leroy_images').as_posix()
+        # base_path = pathlib.Path.home().joinpath('data', 'leroy_images').as_posix()
         folder = pathlib.Path().joinpath(item['_id'])
         filename = pathlib.Path(request.url).name
         return folder.joinpath(filename).as_posix()
