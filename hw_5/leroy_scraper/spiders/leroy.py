@@ -13,7 +13,7 @@ class LeroyScraperSpider(scrapy.Spider):
     allowed_domains = ['leroymerlin.ru']
     start_urls = [f'https://leroymerlin.ru/catalogue/elektricheskie-vodonagrevateli-nakopitelnye/']
 
-    def parse(self, response: HtmlResponse):
+    def parse(self, response: HtmlResponse, **kwargs):
         # parsing next page url
         next_page = response.xpath('//a[contains(@class, "s15wh9uj_plp")][last()]/@href').extract_first()
         if next_page:
