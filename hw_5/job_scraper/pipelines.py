@@ -5,7 +5,6 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
 from pymongo import MongoClient
 
 MONGO_HOST = 'mongodb://localhost:27017/'
@@ -19,5 +18,6 @@ class JobScraperPipeline:
 
     def process_item(self, item, spider):
         collection = self.db[spider.name]
-        collection.insert_one(item)
+        if collection.count_documents(item) == 0:
+            collection.insert_one(item)
         return item
