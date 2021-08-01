@@ -9,24 +9,19 @@ from pymongo import MongoClient
 DRIVER_PATH = pathlib.Path('chromedriver').absolute().as_posix()
 
 
-# def text_generator(words_amount: int):
-#     """ Generates collection of words """
-#     with open('words', 'r', encoding='utf-8') as f:
-#         words = [w.strip() for w in random.choices(f.readlines(), k=words_amount)]
-#     return ' '.join(words)
-
-# работает медленнее, но по идее памяти меньше ест
 def text_generator(words_amount: int):
     """ Generates collection of words """
-    words = []
-    while len(words) < words_amount:
-        with open('words', 'r', encoding='utf-8') as f:
-            word = next(f)
-            for n, w in enumerate(f):
-                if random.randint(0, n + 1):
-                    continue
-                word = w.strip()
-            words.append(word)
+    with open('words', 'r', encoding='utf-8') as f:
+        words = []
+        unique_words_amount = [n for n, _ in enumerate(f)][-1] + 1
+        indexes = sorted([random.randint(0, unique_words_amount) for _ in range(words_amount)])
+        f.seek(0, 0)
+        for n, w in enumerate(f):
+            while n in indexes:
+                words.append(w.strip())
+                indexes.remove(n)
+
+    random.shuffle(words)
     return ' '.join(words)
 
 
