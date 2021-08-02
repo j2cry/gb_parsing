@@ -1,6 +1,6 @@
 import pathlib
 from collections import defaultdict
-from time import sleep
+
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.chrome.options import Options
@@ -51,7 +51,7 @@ driver.implicitly_wait(3)
 
 for shop in SHOP_PARAMS:
     driver.get(shop.get('url'))
-    driver.execute_script("window.scrollTo(0, 1080);")
+    driver.execute_script("window.scrollTo(0, 800);")
 
     next_button = 1
     while next_button:
@@ -59,6 +59,7 @@ for shop in SHOP_PARAMS:
         try:
             next_button.click()
         except ElementClickInterceptedException:
+            # если элемент не кликабельный в момент клика - уже (вроде) не актуально
             driver.execute_script("arguments[0].click();", next_button)
 
         # try to determine if next-button is disabled
@@ -91,6 +92,7 @@ for shop in SHOP_PARAMS:
                 # parameters not found
                 break
 
+            # collect product params
             keys = [k.text for k in driver.find_elements_by_xpath(shop.get('product_keys'))]
             values = [k.text.replace(keys[n], '')
                       for n, k in enumerate(driver.find_elements_by_xpath(shop.get('product_values')))]
@@ -100,11 +102,9 @@ for shop in SHOP_PARAMS:
         products_collection.append(product_info)
 
     # push to db
-    # push to DB
     client = MongoClient('mongodb://localhost:27017/')
     db = client['gb_homework']
     collection = db[shop.get('name')]
     collection.insert_many(products_collection)
-    # with open(shop.get('name'), 'w', encoding='utf-8') as f:
-    #     f.writelines(str(products_collection))
+
 driver.close()
