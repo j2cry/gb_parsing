@@ -38,7 +38,7 @@ def get_news(url):
     for link in links:
         sleep(1)
         # drop links to third-party sites
-        if link.startswith('http') and not link.startswith(url):
+        if (link.startswith('http') and not link.startswith(url)) or (link.find('/extlink/') != -1):
             continue
         news_item = defaultdict(str)
         news_item['link'] = link if link.startswith('http') else url + link[1:]
