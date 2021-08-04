@@ -25,6 +25,7 @@ class MosOpenDataPreparer:
         self.file_types = file_types
 
     def get(self, ds_num: int):
+        """ Download dataset archive, unpack and prepare """
         ds_xpath = f'(//span[@id="dropDepartmentsLink"])[{ds_num if ds_num > 0 else 1}]'
 
         self.driver.get('https://data.mos.ru/opendata')
@@ -35,7 +36,7 @@ class MosOpenDataPreparer:
         ActionChains(self.driver).move_to_element(data_element).perform()
         data_element.click()
         data_link, file_type = None, None
-        # check available types
+        # check available dataset formats
         for ft in self.file_types:
             try:
                 data_link = self.driver.find_element_by_xpath(f'//ul[@id="dropExport"]//a[text()="{ft}"]')
@@ -62,6 +63,10 @@ class MosOpenDataPreparer:
 
     @staticmethod
     def prepare(file_path, file_type):
+        """ Drop NaN columns and save to .csv
+            :param file_path: Path to file that contains open data
+            :param file_type: File extension
+        """
         ft_switcher = {'csv': lambda: pd.read_csv(file_path),
                        'xlsx': lambda: pd.read_excel(file_path)}
         if file_type not in ft_switcher.keys():
@@ -75,4 +80,3 @@ class MosOpenDataPreparer:
 if __name__ == '__main__':
     pre = MosOpenDataPreparer()
     pre.get(140)
-    # pre.prepare()
