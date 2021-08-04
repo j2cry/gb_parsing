@@ -6,11 +6,15 @@ bs4==0.0.1
 certifi==2020.6.20
 cffi==1.14.6
 chardet==3.0.4
+colorama==0.4.4
 conda==4.3.16
+configparser==5.0.2
 constantly==15.1.0
+crayons==0.4.0
 cryptography==3.4.7
 cssselect==1.1.0
 distlib==0.3.1
+et-xmlfile==1.1.0
 fake-headers==1.0.2
 filelock==3.0.12
 h2==3.2.0
@@ -25,6 +29,7 @@ itemloaders==1.0.4
 jmespath==0.10.0
 lxml==4.6.3
 numpy==1.21.0
+openpyxl==3.0.7
 pandas==1.3.0
 parsel==1.6.0
 Pillow==8.3.1
@@ -45,6 +50,7 @@ requests==2.24.0
 ruamel.yaml==0.16.12
 ruamel.yaml.clib==0.2.2
 Scrapy==2.5.0
+selenium==3.141.0
 service-identity==21.1.0
 six==1.16.0
 soupsieve==2.2.1
@@ -55,4 +61,3 @@ virtualenv-clone==0.5.4
 w3lib==1.22.0
 webencodings==0.5.1
 zope.interface==5.4.0
-selenium~=3.141.0
