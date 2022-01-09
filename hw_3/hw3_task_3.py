@@ -1,3 +1,5 @@
+# 3. Написать функцию, которая будет добавлять в вашу базу данных только новые вакансии с сайта.
+
 from typing import List
 from pymongo import MongoClient
 
